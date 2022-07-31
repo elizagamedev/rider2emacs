@@ -1,0 +1,17 @@
+[package]
+name = "rider2emacs"
+description = "Translates JetBrains Rider invocations to emacsclient invocations (for Unity)"
+authors = ["Eliza Velasquez"]
+version = "0.1.0"
+license = "GPL-3.0"
+keywords = ["emacs", "emacsclient", "rider", "jetbrains", "unity"]
+categories = ["command-line-utilities", "text-editors", "game-development"]
+repository = "https://github.com/elizagamedev/rider2emacs/"
+homepage = "https://github.com/elizagamedev/rider2emacs/"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.58"
+shell-escape = "0.1.5"
