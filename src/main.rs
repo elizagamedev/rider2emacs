@@ -9,8 +9,8 @@ use std::process;
 use std::process::Command;
 
 struct FileTarget {
-    line: u32,
-    column: u32,
+    line: Option<u32>,
+    column: Option<u32>,
     filename: String,
 }
 
@@ -28,9 +28,9 @@ fn parse_args() -> Result<Args> {
     // options.
     let mut at_filename_list = false;
     // Line to open the next file.
-    let mut line = 1;
+    let mut line = None;
     // Column to open the next file.
-    let mut column = 1;
+    let mut column = None;
 
     // Parse the arguments, building a list of file targets.
     let mut it = env::args().into_iter().skip(1);
@@ -57,14 +57,14 @@ fn parse_args() -> Result<Args> {
         match arg.as_str() {
             "--line" | "-l" => {
                 line = match it.next() {
-                    Some(arg) => arg.parse::<u32>()?,
+                    Some(arg) => u32::try_from(arg.parse::<i32>()?).ok(),
                     None => return Err(anyhow!("No integer argument passed to {arg}")),
                 };
             }
             "--column" | "-c" => {
                 column = match it.next() {
                     // The Emacs command-line treats column 1 as the first column.
-                    Some(arg) => arg.parse::<u32>()? + 1,
+                    Some(arg) => u32::try_from(arg.parse::<i32>()?).ok().map(|x| x + 1),
                     None => return Err(anyhow!("No integer argument passed to {arg}")),
                 };
             }
@@ -74,8 +74,8 @@ fn parse_args() -> Result<Args> {
                     column,
                     filename: arg,
                 });
-                line = 1;
-                column = 1;
+                line = None;
+                column = None;
             }
         }
     }
@@ -89,6 +89,14 @@ fn parse_args() -> Result<Args> {
 }
 
 fn try_main() -> Result<()> {
+    println!(
+        "{}",
+        env::args()
+            .into_iter()
+            .map(|x| format!("“{x}”"))
+            .collect::<Vec<_>>()
+            .join(" ")
+    );
     let options = parse_args()?;
 
     ensure!(
@@ -101,7 +109,13 @@ fn try_main() -> Result<()> {
         args.push(String::from("-n"));
     }
     for file_target in options.file_targets {
-        args.push(format!("+{}:{}", file_target.line, file_target.column));
+        match file_target.column {
+            Some(column) => args.push(format!("+{}:{}", file_target.line.unwrap_or(1), column)),
+            None => match file_target.line {
+                Some(line) => args.push(format!("+{}", line)),
+                None => {}
+            },
+        }
         args.push(file_target.filename);
     }
 
