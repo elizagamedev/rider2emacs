@@ -2,7 +2,7 @@
 name = "rider2emacs"
 description = "Translates JetBrains Rider invocations to emacsclient invocations (for Unity)"
 authors = ["Eliza Velasquez"]
-version = "0.1.0"
+version = "0.1.1"
 license = "GPL-3.0"
 keywords = ["emacs", "emacsclient", "rider", "jetbrains", "unity"]
 categories = ["command-line-utilities", "text-editors", "game-development"]
